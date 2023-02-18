@@ -241,6 +241,36 @@ class MainWindow: JFrame("Лаба 4") {
         }
         userPanel.add(applyButton)
 
+        // отметки над полями
+        val fullNameLabel = JLabel("Имя сотрудника")
+        fullNameLabel.setBounds(10, 510, 150, 20)
+        fullNameLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(fullNameLabel)
+
+        val jobLabel = JLabel("Должность")
+        jobLabel.setBounds(170, 510, 100, 20)
+        jobLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(jobLabel)
+
+        val addressLabel = JLabel("Адрес")
+        addressLabel.setBounds(280, 510, 100, 20)
+        addressLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(addressLabel)
+
+        val phoneNumberLabel = JLabel("Телефон")
+        phoneNumberLabel.setBounds(390, 510, 100, 20)
+        phoneNumberLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(phoneNumberLabel)
+
+        val usernameLabel = JLabel("Логин")
+        usernameLabel.setBounds(500, 510, 100, 20)
+        usernameLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(usernameLabel)
+
+        val passwordLabel = JLabel("Пароль")
+        passwordLabel.setBounds(610, 510, 100, 20)
+        passwordLabel.horizontalAlignment = SwingConstants.CENTER
+        userPanel.add(passwordLabel)
 
 
         // кнопка возврата
