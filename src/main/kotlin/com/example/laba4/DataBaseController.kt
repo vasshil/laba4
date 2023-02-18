@@ -64,7 +64,7 @@ class DataBaseController {
         sendStatement(task, false)
     }
 
-    fun updateUserByIs(id: Int, user: UserData) {
+    fun updateUserById(id: Int, user: UserData) {
         val task = "update \"user\" set fullName = '${user.fullName}', job = '${user.job}', address = '${user.address}', phoneNumber = '${user.phoneNumber}', username = '${user.username}', password = '${user.password}' where id = $id;"
         sendStatement(task, false)
     }

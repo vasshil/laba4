@@ -22,12 +22,16 @@ class MainWindow: JFrame("Лаба 4") {
 //    private lateinit var usernameField: JTextField
 //    private lateinit var passwordField: JTextField
 
-    private var listOfUsers = JLabel()
+    private val listOfUsers = JLabel()
+    private val usersLabel = JLabel()
+    private var selector = JComboBox(arrayOf(""))
 
     private var role = Roles.NONE
 
     private var username = ""
     private var password = ""
+
+    private var usersList = controller.getUsersFromTable()
 
     init {
 
@@ -67,7 +71,7 @@ class MainWindow: JFrame("Лаба 4") {
             loginPanel.isVisible = false
             guestPanel.isVisible = true
             role = Roles.GUEST
-            setListOfUsers()
+            listOfUsers.text = getUsersLabel()
 
         }
         loginPanel.add(guestButton)
@@ -90,10 +94,12 @@ class MainWindow: JFrame("Лаба 4") {
                     if (role == Roles.SECRETARY) {
                         add(guestPanel)
                         guestPanel.isVisible = true
-                        setListOfUsers()
+                        listOfUsers.text = getUsersLabel()
                     } else {
                         add(userPanel)
                         userPanel.isVisible = true
+
+                        updateInfo()
 
                     }
 
@@ -173,10 +179,14 @@ class MainWindow: JFrame("Лаба 4") {
         userPanel.isVisible = false
 
 
+
+
+
         // список пользователей
-        val usersContainer = JPanel()
-        usersContainer.setBounds(10, 10, 650, 530)
-        userPanel.add(usersContainer)
+        usersLabel.setBounds(10, 10, 650, 530)
+        usersLabel.verticalAlignment = SwingConstants.NORTH
+        userPanel.add(usersLabel)
+
 
 
         // поля ввода
@@ -207,8 +217,11 @@ class MainWindow: JFrame("Лаба 4") {
         val applyButton = JButton("Создать")
         applyButton.setBounds(720, 540, 70, 50)
         applyButton.addActionListener {
+
             if (fullNameField.text.isNotEmpty() && addressField.text.isNotEmpty() && phoneNumberField.text.isNotEmpty() && usernameField.text.isNotEmpty() && passwordField.text.isNotEmpty()){
-                val user = UserData(0,
+
+                val user = UserData(
+                    0,
                     fullNameField.text.toString(),
                     arrayOf("Директор", "Зам. директора", "Секретарь").indexOf(jobField.selectedItem),
                     addressField.text.toString(),
@@ -216,8 +229,19 @@ class MainWindow: JFrame("Лаба 4") {
                     usernameField.text.toString(),
                     passwordField.text.toString()
                 )
-                controller.addNewUser(user)
+
+                if (selector.selectedIndex == 0 && role == Roles.DIRECTOR) { // добавить
+                    controller.addNewUser(user)
+                    updateInfo()
+
+                } else if (selector.selectedIndex > 0) { // обновить
+                    controller.updateUserById(usersList[selector.selectedIndex - 1].id, user)
+                    updateInfo()
+                }
+
             }
+
+
 
         }
         userPanel.add(applyButton)
@@ -237,47 +261,120 @@ class MainWindow: JFrame("Лаба 4") {
         returnButton.setBounds(660, 10, 130, 50)
         userPanel.add(returnButton)
 
-        // кнопка создания
-        val createButton = JButton("Создать")
-        createButton.addActionListener {
+        // кнопка удаления
+        val deleteButton = JButton("Удалить")
+        deleteButton.addActionListener {
+            if (role == Roles.DIRECTOR && selector.selectedIndex > 0) {
+                controller.deleteUserById(usersList[selector.selectedIndex - 1].id)
+
+                updateInfo()
+            }
+        }
+        deleteButton.setBounds(660, 70, 130, 50)
+        userPanel.add(deleteButton)
+
+
+
+
+
+        // выбор сотрудника
+        selector.addActionListener {
+            if (selector.selectedIndex > 0) {
+                val selectedUser = usersList[selector.selectedIndex - 1]
+
+                fullNameField.text = selectedUser.fullName
+                jobField.selectedIndex = selectedUser.job
+                addressField.text = selectedUser.address
+                phoneNumberField.text = selectedUser.phoneNumber
+                usernameField.text = selectedUser.username
+                passwordField.text = selectedUser.password
+
+                applyButton.text = "Обновить"
+
+            } else if (selector.selectedIndex == 0) {
+                fullNameField.text = ""
+                jobField.selectedIndex = 0
+                addressField.text = ""
+                phoneNumberField.text = ""
+                usernameField.text = ""
+                passwordField.text = ""
+
+                applyButton.text = "Добавить"
+
+            }
+
 
         }
-        createButton.setBounds(660, 70, 130, 50)
-        userPanel.add(createButton)
+        selector.setBounds(660, 130, 130, 50)
+        userPanel.add(selector)
+
 
     }
 
-//    private fun getNewUserPanel():  {
-//
-//    }
-
-    private fun setListOfUsers() {
-        if (role == Roles.GUEST) {
-            val usersList = controller.getUsersFromTable()
-            var text =
-                "<html>" +
-                        "<b>Вы вошли как гость!</b><br><br>" +
-                        "<u>Список сотрудников:</u><br>"
-            for (user in usersList) {
-                val job = arrayOf("Директор", "Зам. директора", "Секретарь")[user.job]
-                text +=
-                    "<b>Имя:</b> ${user.fullName}; <b>Должность:</b> $job;<br>"
-            }
-            text += "</html>"
-            listOfUsers.text = text
-        } else if (role == Roles.SECRETARY) {
-            val usersList = controller.getUsersFromTable()
-            var text =
-                "<html>" +
-                        "<b>Вы вошли как секретарь!</b><br><br>" +
-                        "<u>Список сотрудников:</u><br>"
-            for (user in usersList) {
-                val job = arrayOf("Директор", "Зам. директора", "Секретарь")[user.job]
-                text += "<b>Имя:</b> ${user.fullName}; <b>Должность:</b> $job; <b>Адрес:</b> ${user.address}; <b>Номер телефона:</b> ${user.phoneNumber};<br>"
-            }
-            text += "</html>"
-            listOfUsers.text = text
+    private fun getSelectorData(usersList: MutableList<UserData>): Array<String> {
+        var data = mutableListOf("Выберите пользователя")
+        for (user in usersList) {
+            data += user.fullName
         }
+
+        return data.toTypedArray()
+    }
+
+    private fun getUsersLabel(): String {
+        var text = ""
+        if (role != Roles.NONE) {
+            val roles = arrayOf("Директор", "Зам. директора", "Секретарь", "Гость")
+            val roleText = roles[role.ordinal]
+
+            if (role == Roles.GUEST) {
+                updateUsersList()
+                text =
+                    "<html>" +
+                            "<b>Вы вошли как $roleText!</b><br><br>" +
+                            "<u>Список сотрудников:</u><br>"
+                for (user in usersList) {
+                    val job = roles[user.job]
+                    text +=
+                        "<b>Имя:</b> ${user.fullName}; <b>Должность:</b> $job;<br>"
+                }
+                text += "</html>"
+            } else {
+                updateUsersList()
+                text =
+                    "<html>" +
+                            "<b>Вы вошли как $roleText!</b><br><br>" +
+                            "<u>Список сотрудников:</u><br>"
+                for (user in usersList) {
+                    val job = roles[user.job]
+                    text += "<b>Имя:</b> ${user.fullName}; <b>Должность:</b> $job; <b>Адрес:</b> ${user.address}; <b>Номер телефона:</b> ${user.phoneNumber};<br>"
+                }
+                text += "</html>"
+            }
+        }
+
+
+        return text
+    }
+
+    private fun updateUsersList() {
+        usersList = controller.getUsersFromTable()
+    }
+
+    private fun updateSelector() {
+        val newItems = getSelectorData(usersList)
+        for (i in 0 until selector.itemCount) {
+            selector.removeItemAt(0)
+        }
+        for (item in newItems) {
+            selector.addItem(item)
+        }
+        selector.selectedIndex = 0
+    }
+
+    private fun updateInfo() {
+        updateUsersList()
+        updateSelector()
+        usersLabel.text = getUsersLabel()
     }
 
 }
