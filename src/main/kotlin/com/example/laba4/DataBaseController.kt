@@ -1,6 +1,5 @@
 package com.example.laba4
 
-import sun.security.util.Password
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -17,7 +16,7 @@ class DataBaseController {
             println(getUsersFromTable())
             println(getUserRole("admin", "admin"))
         } catch (ignored: SQLException) {
-            println("failed---------------")
+            println("failed")
         }
     }
 

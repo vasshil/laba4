@@ -1,7 +1,5 @@
 package com.example.laba4
 
-import java.awt.BorderLayout
-import java.awt.Color
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JFrame
@@ -18,9 +16,6 @@ class MainWindow: JFrame("Лаба 4") {
     private lateinit var loginPanel: JPanel
     private lateinit var guestPanel: JPanel
     private lateinit var userPanel: JPanel
-
-//    private lateinit var usernameField: JTextField
-//    private lateinit var passwordField: JTextField
 
     private val listOfUsers = JLabel()
     private val usersLabel = JLabel()
@@ -312,7 +307,7 @@ class MainWindow: JFrame("Лаба 4") {
     }
 
     private fun getSelectorData(usersList: MutableList<UserData>): Array<String> {
-        var data = mutableListOf("Выберите пользователя")
+        val data = mutableListOf("Выберите пользователя")
         for (user in usersList) {
             data += user.fullName
         }
